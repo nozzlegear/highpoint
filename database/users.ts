@@ -1,8 +1,6 @@
 import * as Constants from '../modules/constants';
-import { Client, DatabaseConfiguration, GENERIC_LIST_VIEW } from 'davenport';
+import { Client, DatabaseConfiguration } from 'davenport';
 import { User } from 'highpoint';
-
-declare const emit: (key, value?) => void;
 
 class UserDbFactory extends Client<User> {
     constructor() {

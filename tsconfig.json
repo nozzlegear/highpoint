@@ -2,11 +2,14 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es2015",
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "sourceMap": true,
         "outDir": "bin",
         "jsx": "react",
         "experimentalDecorators": true,
+        "strictNullChecks": true,
+        "forceConsistentCasingInFileNames": true,
+        "noUnusedLocals": true,
         "noFallthroughCasesInSwitch": true
     },
     "exclude": [

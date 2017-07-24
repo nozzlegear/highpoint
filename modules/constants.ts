@@ -1,8 +1,4 @@
-import inspect from 'logspect';
 import isBrowser from 'is-in-browser';
-import { resolve } from 'path';
-import { snakeCase } from 'lodash';
-import { User } from 'highpoint';
 
 // NODE_ENV and _VERSION are injected by webpack.
 declare const NODE_ENV: string;
@@ -13,11 +9,11 @@ export const isWebpack = process && process.mainModule && /webpack.js$/.test(pro
 
 export const APP_NAME = "Highpoint";
 
-export const SNAKED_APP_NAME = snakeCase(APP_NAME.toLowerCase());
+export const SNAKED_APP_NAME = "highpoint";
 
-function get(baseKey: string, defaultValue = undefined) {
+function get(baseKey: string, defaultValue: string | number | undefined = undefined) {
     const snakedAppName = SNAKED_APP_NAME.toUpperCase();
-    const snakedKey = snakeCase(baseKey).toUpperCase();
+    const snakedKey = baseKey.toUpperCase();
 
     return env[`${snakedAppName}_${snakedKey}`] || env[`GEARWORKS_${snakedKey}`] || env[snakedKey] || env[`${snakedAppName}_${baseKey}`] || env[baseKey] || defaultValue;
 }

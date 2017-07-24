@@ -37,6 +37,10 @@ export function registerSessionRoutes(app: Express, route: RouterFunction<User>)
                 throw e;
             }
 
+            if (!user._id) {
+                return next(boom.badGateway("Database did not return expected User object."));
+            }
+
             if (!compareSync(model.password, user.hashedPassword)) {
                 return next(boom.unauthorized(`Password is incorrect.`));
             }

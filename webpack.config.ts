@@ -2,10 +2,8 @@ import * as databases from './database';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readPkg from 'read-pkg';
-import * as uglify from 'uglify-es';
 import * as webpack from 'webpack';
 import importToArray from 'import-to-array';
-import { inspect } from 'logspect/bin';
 import StartServerPlugin = require('start-server-webpack-plugin');
 
 // Hack for Ubuntu on Windows: interface enumeration fails with EINVAL, so return empty.
@@ -23,8 +21,8 @@ const isWatching = process.argv.indexOf("--watch") > -1;
 /**
  * Takes a list of plugins and only returns those that are not undefined. Useful when you only pass plugins in certain conditions.
  */
-function filterPlugins(plugins: webpack.Plugin[]) {
-    return (plugins || []).filter(plugin => !!plugin);
+function filterPlugins(plugins: (webpack.Plugin | undefined)[]): webpack.Plugin[] {
+    return (plugins || []).filter(plugin => !!plugin) as webpack.Plugin[];
 }
 
 const baseConfig: webpack.Configuration = {
@@ -62,29 +60,29 @@ const baseConfig: webpack.Configuration = {
     ]),
 }
 
-const clientConfig: webpack.Configuration = {
-    ...baseConfig,
-    entry: {
-        "client": "./client.tsx",
-        "mobile": "./mobile.tsx"
-    },
-    output: {
-        ...baseConfig.output,
-        // Important: publicPath must begin with a / but must not end with one. Else hot module replacement won't find updates.
-        publicPath: "/dist",
-        path: path.join(__dirname, "dist")
-    },
-    plugins: filterPlugins([
-        ...baseConfig.plugins,
-        production ? undefined : new webpack.HotModuleReplacementPlugin(),
-        new webpack.DefinePlugin({
-            "process.env": {
-                "NODE_ENV": `"${process.env.NODE_ENV}"` || `"development"`,
-            }
-        })
-        // TODO: Add an uglify plugin here that supports es2015 (uglify-es)
-    ])
-}
+// const clientConfig: webpack.Configuration = {
+//     ...baseConfig,
+//     entry: {
+//         "client": "./client.tsx",
+//         "mobile": "./mobile.tsx"
+//     },
+//     output: {
+//         ...baseConfig.output,
+//         // Important: publicPath must begin with a / but must not end with one. Else hot module replacement won't find updates.
+//         publicPath: "/dist",
+//         path: path.join(__dirname, "dist")
+//     },
+//     plugins: filterPlugins([
+//         ...baseConfig.plugins as any,
+//         production ? undefined as any : new webpack.HotModuleReplacementPlugin(),
+//         new webpack.DefinePlugin({
+//             "process.env": {
+//                 "NODE_ENV": `"${process.env.NODE_ENV}"` || `"development"`,
+//             }
+//         })
+//         // TODO: Add an uglify plugin here that supports es2015 (uglify-es)
+//     ])
+// }
 
 const serverConfig: webpack.Configuration = {
     ...baseConfig,
@@ -102,7 +100,7 @@ const serverConfig: webpack.Configuration = {
     // Turn off the Node polyfill plugin, which polyfills things like __dirname to "/" instead of the real __dirname.
     node: false as any,
     plugins: filterPlugins([
-        ...baseConfig.plugins,
+        ...baseConfig.plugins as any,
         isWatching ? new StartServerPlugin({
             name: 'server.js',
             nodeArgs: [/* '--inspect' */], // This plugin has suddenly stopped working when passing --inspect. Need to investigate. 
@@ -141,7 +139,7 @@ const serverConfig: webpack.Configuration = {
     externals: {
         ...baseConfig.externals as object,
         // Set all node_modules to external to prevent bundling them unnecessarily
-        ...fs.readdirSync('node_modules').filter(x => [".bin"].indexOf(x) === -1).reduce((output, mod) => {
+        ...fs.readdirSync('node_modules').filter(x => [".bin"].indexOf(x) === -1).reduce((output: any, mod) => {
             output[mod] = 'commonjs ' + mod;
 
             return output

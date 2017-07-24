@@ -1,10 +1,8 @@
 import * as Cache from 'gearworks-cache';
 import * as Constants from './modules/constants';
 import * as express from 'express';
-import * as fs from 'fs';
 import * as http from 'http';
 import * as httpsRedirect from 'redirect-https';
-import * as os from 'os';
 import * as path from 'path';
 import * as routeConfigurations from './routes';
 import importObjectToArray from 'import-to-array';
@@ -53,6 +51,10 @@ async function startServer(hostname: string, port: number) {
         sealable_user_props: Constants.SEALABLE_USER_PROPERTIES,
         shopify_secret_key: "unused",
         userAuthIsValid: async (user) => {
+            if (!user || !user._id) {
+                return false;
+            }
+
             // If user id exists in invalidation cache, return a 401 unauthed response.
             try {
                 const cacheValue = await Cache.getValue(Constants.CACHE_SEGMENT_AUTH, user._id);
@@ -73,9 +75,7 @@ async function startServer(hostname: string, port: number) {
     // Configure the server, cache, databases and routes
     const httpServer = http.createServer(app);
     await Cache.initialize();
-    await Promise.all(Object.getOwnPropertyNames(_DB_CONFIGURATIONS)
-        .filter(prop => prop !== "__esModule")
-        .map(prop => configureDatabase(Constants.COUCHDB_URL, _DB_CONFIGURATIONS[prop], { warnings: false })));
+    await Promise.all(_DB_CONFIGURATIONS.map(config => configureDatabase(Constants.COUCHDB_URL, config, { warnings: false })));
     await Promise.all(importObjectToArray(routeConfigurations).map(r => r(app, router)));
 
     // Wildcard route must be registered after all other routes.
@@ -92,7 +92,7 @@ async function startServer(hostname: string, port: number) {
     })
 
     // Typescript type guard for boom errors
-    function isBoomError(err): err is BoomError {
+    function isBoomError(err: any): err is BoomError {
         return err.isBoom;
     }
 
