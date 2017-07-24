@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2015",
+        "noImplicitAny": false,
+        "sourceMap": true,
+        "outDir": "bin",
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "noFallthroughCasesInSwitch": true
+    },
+    "exclude": [
+        "bin",
+        "node_modules",
+        "scripts"
+    ]
+}
