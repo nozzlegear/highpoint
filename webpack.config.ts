@@ -107,12 +107,12 @@ const serverConfig: webpack.Configuration = {
             args: [], // pass args to script 
         }) : undefined,
         new webpack.BannerPlugin({
-            banner: "require('source-map-support').install();",
+            banner: "require('source-map-support').install();\nfunction REQUIRE_FUNCTION(id){return require(id);}",
             raw: true,
             entryOnly: false
         } as webpack.BannerPlugin.Options),
         new webpack.DefinePlugin({
-            _DB_CONFIGURATIONS: JSON.stringify(importToArray(databases).map(db => db.Config))
+            _DB_CONFIGURATIONS: JSON.stringify(importToArray(databases).map(db => db.Config)),
         }),
         {
             apply: (compiler) => {
@@ -143,7 +143,7 @@ const serverConfig: webpack.Configuration = {
             output[mod] = 'commonjs ' + mod;
 
             return output
-        }, {})
+        }, {}),
     }
 }
 

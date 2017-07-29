@@ -7,9 +7,12 @@ declare module "highpoint" {
 
     export type FunctionType = "timer" | "http";
 
-    export interface HighpointFunction extends CouchDoc {
+    export interface HighpointConfig {
         name: string;
         type: FunctionType;
+    }
+
+    export interface HighpointFunction extends CouchDoc, HighpointConfig {
         updatedAt: number;
     }
 }
