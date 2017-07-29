@@ -9,7 +9,6 @@ declare module "highpoint" {
 
     export interface HighpointFunction extends CouchDoc {
         name: string;
-        filename: string;
         type: FunctionType;
         updatedAt: number;
     }
